@@ -23,3 +23,8 @@ macos-linux/*.log
 macos-linux/*.packages
 macos-linux/*.files
 macos-linux/auto/
+
+# live-build runtime state
+macos-linux/.lock
+macos-linux/.stage/
+macos-linux/local/
