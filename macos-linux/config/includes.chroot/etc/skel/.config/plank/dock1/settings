@@ -4,7 +4,7 @@ CurrentWorkspaceOnly=false
 #The size of dock icons (in pixels).
 IconSize=48
 #If 0, the dock won't hide.  If 1, the dock intelligently hides.
-HideMode=1
+HideMode=0
 #Time (in ms) to wait before unhiding the dock.
 UnhideDelay=0
 #Time (in ms) to wait before hiding the dock.
@@ -12,7 +12,7 @@ HideDelay=0
 #The monitor number for the dock. Use -1 to keep on the primary monitor.
 Monitor=
 #List of *.dockitem files on this dock. DO NOT MODIFY
-DockItems=
+DockItems=thunar.dockitem;;xfce4-terminal.dockitem;;xfce4-appfinder.dockitem;;xfce-settings-manager.dockitem
 #The position for the dock on the monitor.  If 0 (left), 1 (right), 2 (top), 3 (bottom).
 Position=3
 #The dock's position offset from center (in percent).

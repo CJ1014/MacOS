@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=macOS Look Setup
+Exec=/usr/local/bin/macos-setup.sh
+X-GNOME-Autostart-enabled=true
+X-GNOME-Autostart-Delay=2
+OnlyShowIn=XFCE;
