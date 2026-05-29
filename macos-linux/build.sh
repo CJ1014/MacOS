@@ -36,8 +36,15 @@ lb config noauto \
     --bootappend-live "boot=live components quiet splash hostname=macos username=mac" \
     "${@}"
 
-# Build it (downloads packages, builds the squashfs, makes the ISO).
-lb build
+# Build the live filesystem. NOTE: on recent Ubuntu, live-build's own
+# bootloader/ISO stage is broken (missing gfxboot-theme-ubuntu, broken
+# grub-mkimage, missing isohybrid). The chroot + squashfs + kernel/initrd are
+# produced *before* that stage, so we tolerate its failure and then build a
+# clean bootable ISO ourselves with grub-mkrescue.
+lb build || echo "==> (live-build bootloader stage failed as expected; assembling ISO directly)"
+
+# Assemble the bootable hybrid ISO from the live filesystem tree.
+./make-iso.sh "${OUT_ISO:-macos-sonoma.iso}"
 
 echo
 echo "==> Done. ISO: $(ls -1 *.iso 2>/dev/null | head -1)"

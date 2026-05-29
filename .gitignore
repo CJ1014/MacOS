@@ -40,3 +40,5 @@ macos-linux/*.packages*
 macos-linux/*.headers
 macos-linux/*.files
 macos-linux/binary.*
+
+macos-linux/isoroot/

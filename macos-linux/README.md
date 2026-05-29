@@ -20,13 +20,31 @@ like macOS:
 ## Build it (on an Ubuntu host)
 
 ```bash
-sudo apt-get install live-build debootstrap squashfs-tools xorriso
+sudo apt-get install live-build debootstrap squashfs-tools xorriso mtools \
+                     grub-pc-bin grub-efi-amd64-bin
+# host-side theming needs these too:
+sudo apt-get install git sassc libglib2.0-dev-bin imagemagick
 cd macos-linux
-sudo ./build.sh          # produces live-image-amd64.hybrid.iso (~1.2 GB)
+sudo ./build.sh          # produces macos-sonoma.iso (~1.9 GB)
 ```
 
 `RELEASE=noble` is used by default (match your host's Ubuntu codename).
 Run `sudo ./build.sh clean` to reset between builds.
+
+### Why the build has two stages
+
+`build.sh` runs in this order:
+
+1. **`stage-theme.sh`** (host) — clones + installs the WhiteSur GTK theme,
+   icons, and wallpaper into `config/includes.chroot`. Done on the host
+   because cloning inside the build chroot hits CA/TLS issues on some networks.
+2. **`lb build`** — live-build bootstraps Ubuntu, installs the desktop, and
+   builds the squashfs + kernel/initrd.
+3. **`make-iso.sh`** — assembles the bootable hybrid ISO with `grub-mkrescue`.
+   We do this ourselves because live-build's own bootloader/ISO stage is broken
+   on recent Ubuntu (missing `gfxboot-theme-ubuntu`, broken `grub-mkimage`,
+   missing `isohybrid`). `build.sh` therefore tolerates that stage failing and
+   builds the ISO directly from the live filesystem tree.
 
 ## Run it in VirtualBox
 
