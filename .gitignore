@@ -1,0 +1,9 @@
+# build artifacts
+build/
+*.o
+*.elf
+*.iso
+*.ppm
+*.png
+# keep the README screenshot
+!docs/screenshot.png
