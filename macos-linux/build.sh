@@ -28,6 +28,7 @@ lb config noauto \
     --architectures amd64 \
     --archive-areas "main restricted universe multiverse" \
     --binary-images iso-hybrid \
+    --bootloader grub2 \
     --debian-installer false \
     --apt-indices false \
     --apt-recommends true \
