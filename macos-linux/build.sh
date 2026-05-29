@@ -13,6 +13,12 @@ if [ "$1" = "clean" ]; then
     exit 0
 fi
 
+# Stage the macOS theme/icons/wallpaper on the host into includes.chroot
+# (skippable with SKIP_STAGE=1 if you've already staged it).
+if [ "${SKIP_STAGE:-0}" != "1" ]; then
+    ./stage-theme.sh
+fi
+
 # Configure the live system. We target the host's Ubuntu release so the
 # package mirrors match and debootstrap is happy.
 RELEASE="${RELEASE:-noble}"
@@ -22,7 +28,7 @@ lb config noauto \
     --architectures amd64 \
     --archive-areas "main restricted universe multiverse" \
     --binary-images iso-hybrid \
-    --debian-installer none \
+    --debian-installer false \
     --apt-indices false \
     --apt-recommends true \
     --memtest none \

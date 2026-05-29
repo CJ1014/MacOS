@@ -1,48 +1,20 @@
 #!/bin/sh
-# Installs the macOS-style look: WhiteSur GTK theme, WhiteSur icons, and a
-# Sonoma-style wallpaper. Runs inside the live chroot during the build.
-# Kept resilient: if a download fails the build still succeeds (you just fall
-# back to the default desktop theme).
+# Finalize the macOS look inside the image. The heavy lifting (downloading +
+# installing the WhiteSur theme/icons/wallpaper) is done on the host by
+# stage-theme.sh and copied in via includes.chroot; here we just refresh
+# caches and provide a fallback wallpaper if none was staged.
 set -x
 
-WORK=/tmp/macos-theme
-mkdir -p "$WORK"
-cd "$WORK"
+# refresh icon caches for the installed WhiteSur icon themes
+for d in /usr/share/icons/WhiteSur /usr/share/icons/WhiteSur-dark; do
+    [ -d "$d" ] && gtk-update-icon-cache -f "$d" 2>/dev/null || true
+done
 
-# --- WhiteSur GTK theme (window + widget styling) ---
-if git clone --depth=1 https://github.com/vinceliuice/WhiteSur-gtk-theme.git; then
-    cd WhiteSur-gtk-theme
-    ./install.sh -d /usr/share/themes -c Light -c Dark -t blue -N glassy || true
-    cd "$WORK"
-fi
-
-# --- WhiteSur icon theme ---
-if git clone --depth=1 https://github.com/vinceliuice/WhiteSur-icon-theme.git; then
-    cd WhiteSur-icon-theme
-    ./install.sh -d /usr/share/icons || true
-    cd "$WORK"
-fi
-
-# --- Sonoma-style wallpaper ---
+# fallback wallpaper: Sonoma-ish gradient if staging didn't provide one
 mkdir -p /usr/share/backgrounds/macos
-if git clone --depth=1 https://github.com/vinceliuice/WhiteSur-wallpapers.git; then
-    # prefer a Sonoma image; otherwise grab whatever's there
-    cp WhiteSur-wallpapers/4k/*onoma* /usr/share/backgrounds/macos/sonoma.jpg 2>/dev/null \
-      || cp WhiteSur-wallpapers/1080p/*onoma* /usr/share/backgrounds/macos/sonoma.jpg 2>/dev/null \
-      || cp "$(ls WhiteSur-wallpapers/4k/*.jpg 2>/dev/null | head -1)" /usr/share/backgrounds/macos/sonoma.jpg 2>/dev/null \
-      || true
-fi
-
-# Fallback wallpaper: paint a Sonoma-ish gradient with ImageMagick if available,
-# else leave the default. (ImageMagick may not be installed; ignore failure.)
 if [ ! -f /usr/share/backgrounds/macos/sonoma.jpg ]; then
     convert -size 1920x1080 gradient:'#1e3a8a'-'#7c3ac8' \
         /usr/share/backgrounds/macos/sonoma.jpg 2>/dev/null || true
 fi
 
-# refresh icon caches
-gtk-update-icon-cache -f /usr/share/icons/WhiteSur 2>/dev/null || true
-
-cd /
-rm -rf "$WORK"
 exit 0
