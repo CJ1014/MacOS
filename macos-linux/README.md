@@ -13,6 +13,10 @@ like macOS:
 - a Sonoma-style **wallpaper**
 - **Inter** font as a San-Francisco stand-in
 
+![macOS-style desktop](docs/screenshot.png)
+
+*(Captured from the built ISO booting in an emulator — auto-logged into the themed desktop.)*
+
 > This is **not** Apple macOS and ships none of Apple's software — it's an
 > Ubuntu live system themed to resemble macOS. macOS is proprietary and
 > licensed only for Apple hardware.
