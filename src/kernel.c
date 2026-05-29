@@ -26,22 +26,41 @@ static inline void outb(u16 port, u8 v) {
 }
 
 /* ---- framebuffer state, filled in from the Multiboot2 info ---- */
-static volatile u8 *fb;     /* base address              */
-static u32 fb_pitch;        /* bytes per scanline        */
-static u32 fb_w, fb_h;      /* dimensions in pixels      */
-static u32 fb_bpp;          /* bits per pixel            */
+static volatile u8 *fb;     /* base address                       */
+static u32 fb_pitch;        /* bytes per scanline                 */
+static u32 fb_w, fb_h;      /* dimensions in pixels               */
+static u32 fb_bytespp;      /* bytes per pixel (bpp/8)            */
+static u32 r_pos, g_pos, b_pos;  /* channel bit positions          */
 
 #define MENUBAR_H 26
 #define RGB(r,g,b) (((u32)(r)<<16)|((u32)(g)<<8)|(u32)(b))
 
-/* ---- low-level pixel access ---- */
+/* ---- low-level pixel access ----
+ * We don't assume a fixed pixel layout: the channel bit-positions and the
+ * bytes-per-pixel are taken from the framebuffer info GRUB gives us, so the
+ * same code works whether the firmware hands us RGB, BGR, 24-bpp, or 32-bpp.
+ * Colors are always passed around as 0x00RRGGBB and (de)coded here. */
+static inline u32 encode(u32 color) {
+    u32 r=(color>>16)&0xFF, g=(color>>8)&0xFF, b=color&0xFF;
+    return (r<<r_pos) | (g<<g_pos) | (b<<b_pos);
+}
 static inline void put(u32 x, u32 y, u32 color) {
     if (x >= fb_w || y >= fb_h) return;
-    *(volatile u32 *)(fb + y * fb_pitch + x * 4) = color;
+    u32 v = encode(color);
+    volatile u8 *p = fb + y * fb_pitch + x * fb_bytespp;
+    p[0] =  v        & 0xFF;
+    if (fb_bytespp > 1) p[1] = (v >> 8)  & 0xFF;
+    if (fb_bytespp > 2) p[2] = (v >> 16) & 0xFF;
+    if (fb_bytespp > 3) p[3] = (v >> 24) & 0xFF;
 }
 static inline u32 get(u32 x, u32 y) {
     if (x >= fb_w || y >= fb_h) return 0;
-    return *(volatile u32 *)(fb + y * fb_pitch + x * 4);
+    volatile u8 *p = fb + y * fb_pitch + x * fb_bytespp;
+    u32 v = p[0];
+    if (fb_bytespp > 1) v |= (u32)p[1] << 8;
+    if (fb_bytespp > 2) v |= (u32)p[2] << 16;
+    if (fb_bytespp > 3) v |= (u32)p[3] << 24;
+    return RGB((v>>r_pos)&0xFF, (v>>g_pos)&0xFF, (v>>b_pos)&0xFF);
 }
 
 /* alpha-blend src over dst, a in 0..255 */
@@ -220,8 +239,14 @@ static void draw_clock(void) {
     draw_text(clock_x, 9, buf, RGB(30,30,35), 1);
 }
 
-/* ---- Multiboot2 framebuffer discovery ---- */
+/* ---- Multiboot2 framebuffer discovery ----
+ * Tag layout (type 8):
+ *   8:addr(u64) 16:pitch 20:width 24:height 28:bpp(u8) 29:fb_type(u8)
+ *   for direct-RGB (fb_type==1) the color_info starts at 32:
+ *   32:red_pos 33:red_size 34:green_pos 35:green_size 36:blue_pos 37:blue_size
+ */
 #define MB2_TAG_FRAMEBUFFER 8
+#define FB_TYPE_RGB 1
 static int init_framebuffer(u32 magic, u32 mbi) {
     if (magic != 0x36d76289) return 0;       /* not loaded by Multiboot2 */
     u8 *p = (u8 *)mbi + 8;                    /* skip total_size + reserved */
@@ -230,12 +255,22 @@ static int init_framebuffer(u32 magic, u32 mbi) {
         u32 size = *(u32 *)(p+4);
         if (type == 0) break;                 /* end tag */
         if (type == MB2_TAG_FRAMEBUFFER) {
-            fb       = (volatile u8 *)(u32)(*(u64 *)(p+8));
-            fb_pitch = *(u32 *)(p+16);
-            fb_w     = *(u32 *)(p+20);
-            fb_h     = *(u32 *)(p+24);
-            fb_bpp   = *(u8  *)(p+28);
-            return fb_bpp == 32;              /* this kernel assumes 32bpp */
+            u32 bpp     = *(u8 *)(p+28);
+            u32 fb_type = *(u8 *)(p+29);
+            /* Only a direct-color (RGB) graphics framebuffer is usable.
+             * If GRUB left us in text mode (fb_type==2) or a palette mode,
+             * bail out rather than scribbling garbage onto the screen. */
+            if (fb_type != FB_TYPE_RGB) return 0;
+            if (bpp != 24 && bpp != 32) return 0;   /* 8-bit channels only */
+            fb        = (volatile u8 *)(u32)(*(u64 *)(p+8));
+            fb_pitch  = *(u32 *)(p+16);
+            fb_w      = *(u32 *)(p+20);
+            fb_h      = *(u32 *)(p+24);
+            fb_bytespp= bpp / 8;
+            r_pos     = *(u8 *)(p+32);
+            g_pos     = *(u8 *)(p+34);
+            b_pos     = *(u8 *)(p+36);
+            return 1;
         }
         p += (size + 7) & ~7u;                /* tags are 8-byte aligned */
     }

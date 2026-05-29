@@ -65,9 +65,23 @@ make run
    for).
 5. **Start** the VM. GRUB boots straight into AquaOS and the desktop appears.
 
-> AquaOS requests a 1024×768 32-bpp framebuffer via the Multiboot2 framebuffer
-> tag. If a firmware/emulator can't provide a 32-bpp linear framebuffer, the
-> kernel halts safely rather than drawing garbage.
+> AquaOS asks for a 1024×768 32-bpp framebuffer, but it reads the *actual*
+> pixel format (channel bit-positions + bytes-per-pixel) GRUB gives it, so it
+> renders correctly on 24- or 32-bpp RGB/BGR framebuffers alike. If the
+> firmware can only provide a text/palette mode, the kernel halts safely
+> instead of drawing garbage.
+
+### Troubleshooting
+
+- **Garbage / scrambled pixels:** an older build assumed one fixed pixel
+  layout. Rebuild from the latest source (`make`) — the kernel now adapts to
+  the framebuffer the firmware reports. In **VirtualBox**, use the **VBoxVGA**
+  graphics controller (Settings ▸ Display), which gives the most reliable VBE
+  linear framebuffer.
+- **Black screen:** the firmware couldn't set an RGB graphics mode and left
+  GRUB in text mode, so the kernel halted on purpose. Switch the graphics
+  controller to **VBoxVGA** and make sure the VM is **BIOS** (not EFI) under
+  Settings ▸ System.
 
 ## How it works (high level)
 
