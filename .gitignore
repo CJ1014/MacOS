@@ -42,3 +42,6 @@ macos-linux/*.files
 macos-linux/binary.*
 
 macos-linux/isoroot/
+
+# keep the macos-linux screenshot
+!macos-linux/docs/screenshot.png
