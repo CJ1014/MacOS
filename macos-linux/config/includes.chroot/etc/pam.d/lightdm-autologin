@@ -1,0 +1,11 @@
+#%PAM-1.0
+# Permissive autologin PAM stack for the live session: don't require the
+# autologin user to be in the "nopasswdlogin" group (the live user is created
+# at boot by casper, so we can't add it to that group at build time).
+auth     required pam_env.so readenv=1
+auth     required pam_env.so readenv=1 envfile=/etc/default/locale
+auth     required pam_permit.so
+@include common-account
+session  required pam_limits.so
+@include common-session
+@include common-password

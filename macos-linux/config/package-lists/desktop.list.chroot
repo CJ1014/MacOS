@@ -5,16 +5,17 @@ live-boot
 live-config
 live-config-systemd
 
-# X + a lightweight, themeable desktop (console autologin + startx, no DM)
+# X + a lightweight, themeable desktop (lightdm auto-logs into XFCE)
 xorg
 xserver-xorg
-xinit
 xfce4
 xfce4-session
 xfce4-panel
 xfce4-settings
 xfce4-terminal
 thunar
+lightdm
+lightdm-gtk-greeter
 
 # macOS look-and-feel building blocks
 plank
