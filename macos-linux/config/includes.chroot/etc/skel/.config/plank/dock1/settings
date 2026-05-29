@@ -1,0 +1,35 @@
+[PlankDockPreferences]
+#Whether to show only windows of the current workspace.
+CurrentWorkspaceOnly=false
+#The size of dock icons (in pixels).
+IconSize=48
+#If 0, the dock won't hide.  If 1, the dock intelligently hides.
+HideMode=1
+#Time (in ms) to wait before unhiding the dock.
+UnhideDelay=0
+#Time (in ms) to wait before hiding the dock.
+HideDelay=0
+#The monitor number for the dock. Use -1 to keep on the primary monitor.
+Monitor=
+#List of *.dockitem files on this dock. DO NOT MODIFY
+DockItems=
+#The position for the dock on the monitor.  If 0 (left), 1 (right), 2 (top), 3 (bottom).
+Position=3
+#The dock's position offset from center (in percent).
+Offset=0
+#The name of the dock's theme to use.
+Theme=Transparent
+#The alignment for the dock on the monitor's edge.  If 0 (panel mode), 1 (left), 2 (right), 3 (center).
+Alignment=3
+#The number of icons to keep in the dock.
+ItemsAlignment=3
+#Whether to use pressure-based revealing of the dock.
+PressureReveal=false
+#Whether to show only pinned applications.
+PinnedOnly=false
+#Whether to use a single dock for all monitors.
+LockItems=false
+#Whether to disable the dock drag-and-drop.
+ZoomEnabled=true
+#The dock's icon-zoom (in percent).
+ZoomPercent=150

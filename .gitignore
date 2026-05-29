@@ -7,3 +7,19 @@ build/
 *.png
 # keep the README screenshot
 !docs/screenshot.png
+
+# live-build artifacts
+macos-linux/.build/
+macos-linux/cache/
+macos-linux/chroot/
+macos-linux/config/binary
+macos-linux/config/bootstrap
+macos-linux/config/chroot
+macos-linux/config/common
+macos-linux/config/source
+macos-linux/binary/
+macos-linux/*.iso
+macos-linux/*.log
+macos-linux/*.packages
+macos-linux/*.files
+macos-linux/auto/

@@ -1,0 +1,38 @@
+# Packages installed into the live system.
+
+# Live boot machinery
+live-boot
+live-config
+live-config-systemd
+
+# X + a lightweight, themeable desktop (console autologin + startx, no DM)
+xorg
+xserver-xorg
+xinit
+xfce4
+xfce4-session
+xfce4-panel
+xfce4-settings
+xfce4-terminal
+thunar
+
+# macOS look-and-feel building blocks
+plank
+picom
+fonts-inter
+fonts-noto-core
+papirus-icon-theme
+
+# Tools needed by the theming hook (compiles the WhiteSur GTK theme)
+git
+sassc
+libglib2.0-dev-bin
+gtk2-engines-murrine
+gnome-themes-extra
+imagemagick
+
+# Niceties
+network-manager
+network-manager-gnome
+sudo
+ca-certificates
