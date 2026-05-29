@@ -33,3 +33,10 @@ macos-linux/local/
 macos-linux/config/includes.chroot/usr/share/themes/
 macos-linux/config/includes.chroot/usr/share/icons/
 macos-linux/config/includes.chroot/usr/share/backgrounds/
+
+# live-build generated manifests in project root
+macos-linux/chroot.*
+macos-linux/*.packages*
+macos-linux/*.headers
+macos-linux/*.files
+macos-linux/binary.*
